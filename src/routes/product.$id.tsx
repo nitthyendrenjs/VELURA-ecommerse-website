@@ -8,7 +8,7 @@ import { Stars, formatPrice } from "@/components/Stars";
 import { ProductCard } from "@/components/ProductCard";
 
 export const Route = createFileRoute("/product/$id")({
-  loader: ({ params }) => {
+  loader: ({ params }): { product: import("@/data/products").Product } => {
     const product = getProduct(params.id);
     if (!product) throw notFound();
     return { product };
