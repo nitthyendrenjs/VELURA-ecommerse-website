@@ -44,7 +44,8 @@ const reviews = [
 ];
 
 function Detail() {
-  const { product } = Route.useLoaderData()!;
+  const data = Route.useLoaderData() as { product: import("@/data/products").Product };
+  const { product } = data;
   const [mainImg, setMainImg] = useState(0);
   const [size, setSize] = useState(product.sizes[0]);
   const [color, setColor] = useState(product.colors[0]);
