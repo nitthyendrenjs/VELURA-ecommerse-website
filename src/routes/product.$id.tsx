@@ -44,7 +44,7 @@ const reviews = [
 ];
 
 function Detail() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData()!;
   const [mainImg, setMainImg] = useState(0);
   const [size, setSize] = useState(product.sizes[0]);
   const [color, setColor] = useState(product.colors[0]);
