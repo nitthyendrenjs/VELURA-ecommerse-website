@@ -145,11 +145,12 @@ function Checkout() {
                 <ul className="space-y-3">
                   {items.map((i) => (
                     <li key={i.id} className="flex items-center gap-3">
-                      <img src={i.product.images[0]} alt="" className="h-12 w-12 rounded object-cover" />
-                      <span className="flex-1 text-sm">{i.product.name} × {i.quantity}</span>
-                      <span className="text-sm font-medium">{formatPrice(i.product.price * i.quantity)}</span>
+                      <img src={i.image} alt="" className="h-12 w-12 rounded object-cover" />
+                      <span className="flex-1 text-sm">{i.name} × {i.quantity}</span>
+                      <span className="text-sm font-medium">{formatPrice(i.price * i.quantity)}</span>
                     </li>
                   ))}
+
                 </ul>
               </ReviewBlock>
               <div className="flex gap-3">
@@ -167,8 +168,9 @@ function Checkout() {
           <ul className="mt-4 space-y-3 border-b border-border pb-4">
             {items.map((i) => (
               <li key={i.id} className="flex items-center gap-3 text-sm">
-                <img src={i.product.images[0]} className="h-10 w-10 rounded object-cover" alt="" />
-                <span className="flex-1 truncate">{i.product.name}</span>
+                <img src={i.image} className="h-10 w-10 rounded object-cover" alt="" />
+                <span className="flex-1 truncate">{i.name}</span>
+
                 <span>×{i.quantity}</span>
               </li>
             ))}
