@@ -163,10 +163,15 @@ export function SearchModal() {
     if (!open) setQ("");
   }, [open]);
 
+  const { data } = useQuery({
+    queryKey: ["search", q],
+    queryFn: () => listProducts({ data: { search: q, limit: 6, sort: "popular" } }),
+    enabled: open && q.length > 1,
+  });
+  const results = (q.length > 1 ? ((data ?? []) as ProductWithCategory[]) : []).slice(0, 6);
+
   if (!open) return null;
-  const results = q
-    ? products.filter((p) => p.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6)
-    : [];
+
 
   return (
     <div
