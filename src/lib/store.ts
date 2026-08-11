@@ -127,18 +127,25 @@ export const useWishlist = create<WishlistState>()(
 
 type UIState = {
   cartOpen: boolean;
+  authOpen: boolean;
+  authTab: "login" | "signup";
   searchOpen: boolean;
   mobileNavOpen: boolean;
   setCartOpen: (v: boolean) => void;
+  setAuthOpen: (v: boolean, tab?: "login" | "signup") => void;
   setSearchOpen: (v: boolean) => void;
   setMobileNavOpen: (v: boolean) => void;
 };
 
 export const useUI = create<UIState>((set) => ({
   cartOpen: false,
+  authOpen: false,
+  authTab: "login",
   searchOpen: false,
   mobileNavOpen: false,
   setCartOpen: (v) => set({ cartOpen: v }),
+  setAuthOpen: (v, tab) => set({ authOpen: v, authTab: tab ?? "login" }),
   setSearchOpen: (v) => set({ searchOpen: v }),
   setMobileNavOpen: (v) => set({ mobileNavOpen: v }),
 }));
+

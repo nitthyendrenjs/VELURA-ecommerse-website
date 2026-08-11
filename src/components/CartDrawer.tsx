@@ -3,13 +3,12 @@ import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart, useUI } from "@/lib/store";
-import { formatPrice } from "./Stars";
+import { formatPrice } from "@/lib/format";
 
 export function CartDrawer() {
   const open = useUI((s) => s.cartOpen);
   const setOpen = useUI((s) => s.setCartOpen);
-  const { items, remove, setQty, applyPromo, removePromo, promo, subtotal, discount, total } =
-    useCart();
+  const { items, remove, setQty, promo, setPromo, subtotal, discount, total } = useCart();
   const [code, setCode] = useState("");
   const navigate = useNavigate();
 
@@ -42,7 +41,7 @@ export function CartDrawer() {
             <div>
               <p className="font-display text-lg">Your bag is empty</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Discover pieces you'll love and add them here.
+                Discover products you'll love and add them here.
               </p>
             </div>
             <button
@@ -61,14 +60,10 @@ export function CartDrawer() {
               <ul className="space-y-4">
                 {items.map((i) => (
                   <li key={i.id} className="flex gap-4">
-                    <img
-                      src={i.product.images[0]}
-                      alt={i.product.name}
-                      className="h-24 w-20 rounded-md object-cover"
-                    />
+                    <img src={i.image} alt={i.name} className="h-24 w-20 rounded-md object-cover" />
                     <div className="flex flex-1 flex-col">
                       <div className="flex justify-between gap-2">
-                        <p className="text-sm font-medium">{i.product.name}</p>
+                        <p className="text-sm font-medium">{i.name}</p>
                         <button
                           onClick={() => remove(i.id)}
                           aria-label="Remove"
@@ -77,9 +72,9 @@ export function CartDrawer() {
                           <Trash2 size={16} />
                         </button>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Size: {i.size} · <span className="inline-flex items-center gap-1">Color: <span className="inline-block h-3 w-3 rounded-full border border-border" style={{background:i.color}} /></span>
-                      </p>
+                      {i.variant && (
+                        <p className="text-xs text-muted-foreground">{i.variant}</p>
+                      )}
                       <div className="mt-auto flex items-center justify-between">
                         <div className="flex items-center rounded-md border border-border">
                           <button
@@ -99,7 +94,7 @@ export function CartDrawer() {
                           </button>
                         </div>
                         <span className="text-sm font-semibold">
-                          {formatPrice(i.product.price * i.quantity)}
+                          {formatPrice(i.price * i.quantity)}
                         </span>
                       </div>
                     </div>
@@ -118,11 +113,14 @@ export function CartDrawer() {
                 />
                 <button
                   onClick={() => {
-                    const ok = applyPromo(code);
+                    const ok = code.trim().toUpperCase() === "VELURA10";
+                    if (ok) {
+                      setPromo({ code: "VELURA10", type: "percent", value: 10, amount: 0 });
+                      setCode("");
+                    }
                     toast[ok ? "success" : "error"](
-                      ok ? "Promo applied: 10% off" : "Invalid promo code"
+                      ok ? "Promo applied: 10% off" : "Invalid promo code",
                     );
-                    if (ok) setCode("");
                   }}
                   className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
@@ -131,16 +129,16 @@ export function CartDrawer() {
               </div>
               {promo && (
                 <button
-                  onClick={removePromo}
+                  onClick={() => setPromo(null)}
                   className="mt-2 text-xs text-muted-foreground hover:text-destructive"
                 >
-                  Remove promo ({promo})
+                  Remove promo ({promo.code})
                 </button>
               )}
 
               <div className="mt-4 space-y-1.5 text-sm">
                 <Row label="Subtotal" value={formatPrice(subtotal())} />
-                {promo && <Row label="Discount (10%)" value={`-${formatPrice(discount())}`} />}
+                {promo && <Row label="Discount" value={`-${formatPrice(discount())}`} />}
                 <div className="my-2 border-t border-border" />
                 <Row label="Total" value={formatPrice(total())} bold />
               </div>
