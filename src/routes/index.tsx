@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
-import { products } from "@/data/products";
+import { getHomeData } from "@/lib/catalog.functions";
+import type { Product } from "@/lib/types";
+
 import { ProductCard } from "@/components/ProductCard";
 import { Stars } from "@/components/Stars";
 

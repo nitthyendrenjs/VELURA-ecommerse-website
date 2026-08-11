@@ -168,8 +168,9 @@ function Checkout() {
           <ul className="mt-4 space-y-3 border-b border-border pb-4">
             {items.map((i) => (
               <li key={i.id} className="flex items-center gap-3 text-sm">
-                <img src={i.product.images[0]} className="h-10 w-10 rounded object-cover" alt="" />
-                <span className="flex-1 truncate">{i.product.name}</span>
+                <img src={i.image} className="h-10 w-10 rounded object-cover" alt="" />
+                <span className="flex-1 truncate">{i.name}</span>
+
                 <span>×{i.quantity}</span>
               </li>
             ))}
