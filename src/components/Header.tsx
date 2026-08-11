@@ -204,16 +204,17 @@ export function SearchModal() {
               key={p.id}
               onClick={() => {
                 setOpen(false);
-                navigate({ to: "/product/$id", params: { id: p.id } });
+                navigate({ to: "/product/$slug", params: { slug: p.slug } });
               }}
               className="flex w-full items-center gap-4 rounded-md p-2 text-left hover:bg-secondary"
             >
-              <img src={p.images[0]} alt="" className="h-14 w-14 rounded-md object-cover" />
+              <img src={p.images?.[0]} alt="" className="h-14 w-14 rounded-md object-cover" />
               <div className="flex-1">
                 <p className="text-sm font-medium">{p.name}</p>
-                <p className="text-xs text-muted-foreground">{p.category}</p>
+                <p className="text-xs text-muted-foreground">{p.category_name}</p>
               </div>
-              <span className="text-sm font-semibold">${p.price}</span>
+              <span className="text-sm font-semibold">{formatPrice(p.price)}</span>
+
             </button>
           ))}
           {!q && (
