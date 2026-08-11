@@ -19,4 +19,4 @@ export function Stars({ rating, size = 14 }: { rating: number; size?: number }) 
   );
 }
 
-export const formatPrice = (n: number) => `$${n.toFixed(0)}`;
+export { formatPrice } from "@/lib/format";

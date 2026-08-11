@@ -1,26 +1,38 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Product } from "@/data/products";
+import type { Product } from "./types";
 
 export type CartItem = {
   id: string;
-  product: Product;
-  size: string;
-  color: string;
+  productId: string;
+  slug: string;
+  name: string;
+  image: string;
+  price: number;
+  variant: string;
   quantity: number;
+  weightGrams: number;
+  sku: string | null;
+};
+
+export type AppliedPromo = {
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  amount: number;
 };
 
 type CartState = {
   items: CartItem[];
-  promo: string | null;
-  add: (product: Product, size?: string, color?: string, qty?: number) => void;
+  promo: AppliedPromo | null;
+  add: (product: Product, variant?: string, qty?: number) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
   clear: () => void;
-  applyPromo: (code: string) => boolean;
-  removePromo: () => void;
+  setPromo: (p: AppliedPromo | null) => void;
   subtotal: () => number;
   discount: () => number;
+  weight: () => number;
   total: () => number;
   count: () => number;
 };
@@ -30,39 +42,59 @@ export const useCart = create<CartState>()(
     (set, get) => ({
       items: [],
       promo: null,
-      add: (product, size, color, qty = 1) => {
-        const s = size ?? product.sizes[0];
-        const c = color ?? product.colors[0];
-        const key = `${product.id}-${s}-${c}`;
+      add: (product, variant = "", qty = 1) => {
+        const key = `${product.id}::${variant}`;
         const existing = get().items.find((i) => i.id === key);
         if (existing) {
-          set({ items: get().items.map((i) => (i.id === key ? { ...i, quantity: i.quantity + qty } : i)) });
-        } else {
-          set({ items: [...get().items, { id: key, product, size: s, color: c, quantity: qty }] });
+          set({
+            items: get().items.map((i) =>
+              i.id === key ? { ...i, quantity: i.quantity + qty } : i,
+            ),
+          });
+          return;
         }
+        set({
+          items: [
+            ...get().items,
+            {
+              id: key,
+              productId: product.id,
+              slug: product.slug,
+              name: product.name,
+              image: product.images?.[0] ?? "",
+              price: Number(product.price),
+              variant,
+              quantity: qty,
+              weightGrams: product.weight_grams ?? 500,
+              sku: product.sku ?? null,
+            },
+          ],
+        });
       },
       remove: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
       setQty: (id, qty) =>
         set({
-          items: get()
-            .items.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, qty) } : i)),
+          items: get().items.map((i) =>
+            i.id === id ? { ...i, quantity: Math.max(1, qty) } : i,
+          ),
         }),
       clear: () => set({ items: [], promo: null }),
-      applyPromo: (code) => {
-        if (code.trim().toUpperCase() === "VELURA10") {
-          set({ promo: "VELURA10" });
-          return true;
-        }
-        return false;
+      setPromo: (p) => set({ promo: p }),
+      subtotal: () => get().items.reduce((s, i) => s + i.price * i.quantity, 0),
+      discount: () => {
+        const promo = get().promo;
+        if (!promo) return 0;
+        const sub = get().subtotal();
+        const amount = promo.type === "percent" ? (sub * promo.value) / 100 : promo.value;
+        return Math.min(Math.round(amount), sub);
       },
-      removePromo: () => set({ promo: null }),
-      subtotal: () => get().items.reduce((s, i) => s + i.product.price * i.quantity, 0),
-      discount: () => (get().promo ? get().subtotal() * 0.1 : 0),
+      weight: () =>
+        get().items.reduce((s, i) => s + (i.weightGrams || 500) * i.quantity, 0),
       total: () => get().subtotal() - get().discount(),
       count: () => get().items.reduce((s, i) => s + i.quantity, 0),
     }),
-    { name: "velura-cart" }
-  )
+    { name: "velura-cart-v2" },
+  ),
 );
 
 type WishlistState = {
@@ -89,30 +121,24 @@ export const useWishlist = create<WishlistState>()(
       remove: (id) => set({ ids: get().ids.filter((x) => x !== id) }),
       clear: () => set({ ids: [] }),
     }),
-    { name: "velura-wishlist" }
-  )
+    { name: "velura-wishlist-v2" },
+  ),
 );
 
 type UIState = {
   cartOpen: boolean;
-  authOpen: boolean;
-  authTab: "login" | "signup";
   searchOpen: boolean;
   mobileNavOpen: boolean;
   setCartOpen: (v: boolean) => void;
-  setAuthOpen: (v: boolean, tab?: "login" | "signup") => void;
   setSearchOpen: (v: boolean) => void;
   setMobileNavOpen: (v: boolean) => void;
 };
 
 export const useUI = create<UIState>((set) => ({
   cartOpen: false,
-  authOpen: false,
-  authTab: "login",
   searchOpen: false,
   mobileNavOpen: false,
   setCartOpen: (v) => set({ cartOpen: v }),
-  setAuthOpen: (v, tab) => set({ authOpen: v, authTab: tab ?? "login" }),
   setSearchOpen: (v) => set({ searchOpen: v }),
   setMobileNavOpen: (v) => set({ mobileNavOpen: v }),
 }));
