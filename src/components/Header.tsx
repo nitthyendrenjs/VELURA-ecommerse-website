@@ -2,7 +2,11 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart, useUI, useWishlist } from "@/lib/store";
-import { products } from "@/data/products";
+import { useQuery } from "@tanstack/react-query";
+import { listProducts } from "@/lib/catalog.functions";
+import { formatPrice } from "@/lib/format";
+import type { ProductWithCategory } from "@/lib/types";
+
 
 const navLinks = [
   { to: "/", label: "Home" },
