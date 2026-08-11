@@ -15,6 +15,7 @@ import { Header, SearchModal } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
 import { AuthModal } from "@/components/AuthModal";
+import { useAuth } from "@/lib/auth-store";
 
 function NotFoundComponent() {
   return (
@@ -128,6 +129,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const initAuth = useAuth((s) => s.init);
+
+  useEffect(() => {
+    return initAuth();
+  }, [initAuth]);
 
   return (
     <QueryClientProvider client={queryClient}>

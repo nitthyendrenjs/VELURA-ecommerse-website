@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Heart, Menu, Search, ShoppingBag, User, X, LogOut, Package, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useCart, useUI, useWishlist } from "@/lib/store";
+import { useAuth } from "@/lib/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { listProducts } from "@/lib/catalog.functions";
 import { formatPrice } from "@/lib/format";
@@ -21,6 +22,8 @@ export function Header() {
   const cartCount = useCart((s) => s.count());
   const wishCount = useWishlist((s) => s.ids.length);
   const { setCartOpen, setAuthOpen, setSearchOpen, setMobileNavOpen, mobileNavOpen } = useUI();
+  const user = useAuth((s) => s.user);
+  const session = useAuth((s) => s.session);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -70,9 +73,9 @@ export function Header() {
             <IconBtn label="Search" onClick={() => setSearchOpen(true)}>
               <Search size={18} />
             </IconBtn>
-            <IconBtn label="Account" onClick={() => setAuthOpen(true, "login")}>
+            {session ? <UserMenu /> : <IconBtn label="Account" onClick={() => setAuthOpen(true, "login")}>
               <User size={18} />
-            </IconBtn>
+            </IconBtn>}
             <Link
               to="/wishlist"
               className="relative grid h-9 w-9 place-items-center rounded-full hover:bg-secondary"
@@ -96,6 +99,63 @@ export function Header() {
 
       {mobileNavOpen && <MobileNav onClose={() => setMobileNavOpen(false)} />}
     </>
+  );
+}
+
+function UserMenu() {
+  const user = useAuth((s) => s.user);
+  const signOut = useAuth((s) => s.signOut);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const name = (user?.user_metadata?.full_name as string) || user?.email?.split("@")[0] || "Account";
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-secondary"
+      >
+        <div className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+          {name.charAt(0).toUpperCase()}
+        </div>
+        <ChevronDown size={14} className="text-muted-foreground" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-lg border border-border bg-card shadow-luxe">
+          <div className="border-b border-border px-4 py-3">
+            <p className="truncate text-sm font-medium">{name}</p>
+            <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+          </div>
+          <div className="p-1.5">
+            <MenuItem icon={<Package size={15} />} label="My Orders" onClick={() => { setOpen(false); navigate({ to: "/account" }); }} />
+            <MenuItem icon={<User size={15} />} label="My Account" onClick={() => { setOpen(false); navigate({ to: "/account" }); }} />
+            <MenuItem icon={<LogOut size={15} />} label="Sign Out" onClick={() => { setOpen(false); signOut(); }} danger />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MenuItem({ icon, label, onClick, danger }: { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm transition hover:bg-secondary ${danger ? "text-destructive" : "text-foreground"}`}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }
 
