@@ -8,18 +8,27 @@ import { ProductCard } from "@/components/ProductCard";
 import { Stars } from "@/components/Stars";
 
 export const Route = createFileRoute("/")({
+  loader: () => getHomeData(),
   head: () => ({
     meta: [
-      { title: "Velura — Wear What You Feel" },
+      { title: "Velura — Premium Lifestyle & Fashion Store" },
       {
         name: "description",
         content:
-          "Discover Velura's quietly luxurious collection of clothing and accessories — designed to last, made to feel.",
+          "Shop Velura's curated range of apparel, accessories, home, electronics, beauty and footwear — delivered across India.",
       },
+      { property: "og:title", content: "Velura — Premium Lifestyle & Fashion Store" },
+      {
+        property: "og:description",
+        content: "Curated apparel, accessories, home, electronics, beauty and footwear.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
 });
+
 
 const heroImg =
   "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1900&q=80";
