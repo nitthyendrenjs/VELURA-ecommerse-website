@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { Product, ProductWithCategory } from "./types";
+
 
 const PRODUCT_COLUMNS =
   "id,name,slug,sku,description,brand,category_id,price,compare_at_price,stock,low_stock_threshold,weight_grams,images,options,tags,status,is_featured,is_new,rating,review_count,created_at";
