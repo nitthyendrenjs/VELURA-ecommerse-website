@@ -47,8 +47,10 @@ const testimonials = [
 ];
 
 function Home() {
-  const trending = products.filter((p) => p.isTrending).slice(0, 8);
-  const newArrivals = products.filter((p) => p.isNew).slice(0, 6);
+  const data = Route.useLoaderData();
+  const trending = (data.featured as Product[]).slice(0, 8);
+  const newArrivals = (data.fresh as Product[]).slice(0, 6);
+
 
   return (
     <div>
