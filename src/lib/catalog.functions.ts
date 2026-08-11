@@ -49,11 +49,11 @@ export const listProducts = createServerFn({ method: "GET" })
     else query = query.order("created_at", { ascending: false });
 
     const { data: rows } = await query;
-    return (rows ?? []).map((r) => {
+    return ((rows ?? []) as unknown[]).map((r) => {
       const { categories, ...rest } = r as Record<string, unknown> & {
         categories?: { name: string } | null;
       };
-      return { ...rest, category_name: categories?.name ?? null };
+      return { ...rest, category_name: categories?.name ?? null } as ProductWithCategory;
     });
   });
 
@@ -69,23 +69,28 @@ export const getProductBySlug = createServerFn({ method: "GET" })
       .eq("status", "active")
       .maybeSingle();
     if (!row) return null;
-    const { categories, ...rest } = row as Record<string, unknown> & {
+    const { categories, ...rest } = row as unknown as Record<string, unknown> & {
       categories?: { name: string } | null;
       category_id?: string | null;
     };
-    let related: unknown[] = [];
-    if (rest["category_id"]) {
+    let related: Product[] = [];
+    if (rest.category_id) {
       const { data: rel } = await client
         .from("products")
         .select(PRODUCT_COLUMNS)
         .eq("status", "active")
-        .eq("category_id", rest["category_id"] as string)
+        .eq("category_id", rest.category_id)
         .neq("slug", data.slug)
         .limit(4);
-      related = rel ?? [];
+      related = (rel ?? []) as unknown as Product[];
     }
-    return { product: { ...rest, category_name: categories?.name ?? null }, related };
+    const product = {
+      ...rest,
+      category_name: categories?.name ?? null,
+    } as unknown as ProductWithCategory;
+    return { product, related };
   });
+
 
 export const getHomeData = createServerFn({ method: "GET" }).handler(async () => {
   const { getPublicClient } = await import("./supabase-public.server");
