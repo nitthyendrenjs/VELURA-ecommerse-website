@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -63,6 +64,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
+  '/admin': typeof AuthenticatedAdminRouteRoute
   '/account': typeof AuthenticatedAccountRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
+  '/admin': typeof AuthenticatedAdminRouteRoute
   '/account': typeof AuthenticatedAccountRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/shop'
     | '/wishlist'
+    | '/admin'
     | '/account'
     | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/shop'
     | '/wishlist'
+    | '/admin'
     | '/account'
     | '/product/$slug'
   id:
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/shop'
     | '/wishlist'
+    | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/product/$slug'
   fileRoutesById: FileRoutesById
@@ -206,14 +218,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRoute
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRoute,
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
 }
 
