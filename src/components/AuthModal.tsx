@@ -86,8 +86,9 @@ function GoogleButton() {
       disabled={loading}
       onClick={async () => {
         setLoading(true);
-        const { error } = await supabase.auth.signInWithOAuth("google", {
-          redirectTo: window.location.origin,
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: window.location.origin },
         });
         if (error) {
           toast.error("Google sign-in failed", { description: error.message });
